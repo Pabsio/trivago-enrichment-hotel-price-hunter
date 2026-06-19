@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hotel Price Hunter — User Manual</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --p:#6A3460;--bg:#f5f2f5;--card:#fff;--tx:#1a1a1a;--txs:#555;--txm:#999;
+      --bd:#e4dce4;--code-bg:#f3edf3;--note-bg:#fdf8e8;--note-bd:#f0d060;--note-c:#7a6000;
+      --tag-bg:#f3edf3;--tag-c:#6A3460;
+    }
+    [data-theme=dark]{
+      --bg:#0f0a0f;--card:#1a101a;--tx:#f0e8f0;--txs:#a89aa8;--txm:#6a4a6a;
+      --bd:#2a1a2a;--code-bg:#2a1a2a;--note-bg:#1a1500;--note-bd:#5a4500;--note-c:#d4b040;
+      --tag-bg:#2a1a2a;--tag-c:#c084c0;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Open Sans',sans-serif;background:var(--bg);color:var(--tx);line-height:1.7;transition:background .2s,color .2s}
+
+    .site-header{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid #ede8ed;padding:0 2rem;height:56px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+    .site-header .brand{display:flex;align-items:center;gap:10px}
+    .site-header .brand-icon{font-size:22px;line-height:1}
+    .site-header h1{font-family:'Inter',sans-serif;font-size:18px;font-weight:800;color:#1a1a1a;letter-spacing:-.3px}
+    .site-header .sub{font-size:11px;color:#999;margin-top:1px}
+    .theme-btn{padding:6px 14px;background:#f5f0f5;color:#6A3460;border:1.5px solid #e4dce4;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+    .theme-btn:hover{background:#6A3460;color:#fff}
+
+    .layout{display:grid;grid-template-columns:240px 1fr;max-width:1100px;margin:0 auto;padding:2rem 1.5rem;gap:3rem;align-items:start}
+
+    .sidebar{position:sticky;top:76px;max-height:calc(100vh - 100px);overflow-y:auto}
+    .sidebar nav{display:flex;flex-direction:column;gap:2px}
+    .sidebar .nav-section{font-size:10px;font-weight:700;color:var(--txm);text-transform:uppercase;letter-spacing:.1em;margin:14px 0 4px;padding-left:8px}
+    .sidebar a{font-size:13px;color:var(--txs);text-decoration:none;padding:5px 8px;border-radius:6px;transition:all .1s;display:block}
+    .sidebar a:hover{background:var(--tag-bg);color:var(--p)}
+    .sidebar a.active{background:var(--tag-bg);color:var(--p);font-weight:700}
+
+    .content{min-width:0}
+    .content section{margin-bottom:4rem}
+    .section-num{font-size:11px;font-weight:700;color:var(--p);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem}
+    h2{font-size:26px;font-weight:800;color:var(--tx);margin-bottom:1rem;line-height:1.25}
+    h3{font-size:18px;font-weight:700;color:var(--tx);margin:1.75rem 0 .6rem}
+    p{font-size:15px;color:var(--txs);margin-bottom:.9rem}
+    ul,ol{padding-left:1.4rem;margin-bottom:.9rem}
+    li{font-size:15px;color:var(--txs);margin-bottom:.35rem}
+    li strong{color:var(--tx)}
+    strong{color:var(--tx)}
+    code{background:var(--code-bg);color:var(--p);padding:2px 7px;border-radius:5px;font-family:'Courier New',monospace;font-size:13px}
+    hr{border:none;border-top:1px solid var(--bd);margin:2.5rem 0}
+
+    .hero{text-align:center;padding:3rem 0 2rem}
+    .hero .icon{font-size:52px;margin-bottom:1rem}
+    .hero h2{font-size:32px;font-weight:800;color:var(--tx);margin-bottom:.5rem}
+    .hero h2 em{color:var(--p);font-style:normal}
+    .hero p{font-size:16px;color:var(--txs);max-width:520px;margin:0 auto}
+
+    .note{background:var(--note-bg);border:1.5px solid var(--note-bd);border-radius:10px;padding:.9rem 1.1rem;margin:1rem 0;font-size:14px;color:var(--note-c);line-height:1.6}
+
+    .tbl-wrap{overflow-x:auto;margin:1rem 0}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    thead th{background:var(--tag-bg);color:var(--p);font-weight:700;padding:9px 12px;text-align:left;border-bottom:2px solid var(--bd)}
+    tbody td{padding:9px 12px;border-bottom:1px solid var(--bd);color:var(--txs);vertical-align:top}
+    tbody tr:last-child td{border-bottom:none}
+    tbody tr:hover td{background:var(--tag-bg)}
+
+    .steps{counter-reset:step;display:flex;flex-direction:column;gap:.75rem;margin:1rem 0}
+    .step{display:flex;gap:14px;align-items:flex-start}
+    .step-n{counter-increment:step;width:28px;height:28px;border-radius:50%;background:var(--p);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+    .step-n::before{content:counter(step)}
+    .step-body{font-size:15px;color:var(--txs);line-height:1.6;flex:1}
+    .step-body strong{color:var(--tx)}
+
+    .tag{display:inline-block;background:var(--tag-bg);color:var(--tag-c);padding:2px 10px;border-radius:20px;font-size:12px;font-weight:700;margin:0 2px}
+    .chip-row{display:flex;flex-wrap:wrap;gap:6px;margin:.75rem 0}
+    .chip-demo{padding:5px 14px;border-radius:20px;font-size:14px;font-weight:600;border:1.5px solid var(--bd);background:var(--card);color:var(--txs)}
+    .chip-demo.on{background:var(--p);border-color:var(--p);color:#fff}
+
+    @media(max-width:768px){.layout{grid-template-columns:1fr;padding:1rem}.sidebar{display:none}}
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">
+    <div class="brand-icon">🏨</div>
+    <div>
+      <h1>Hotel Price Hunter</h1>
+      <div class="sub">User Manual · HolidayPirates Internal Tool</div>
+    </div>
+  </div>
+  <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">🌙 Dark</button>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <nav id="sidenav">
+      <div class="nav-section">Getting started</div>
+      <a href="#intro">Introduction</a>
+      <a href="#quickstart">Quick start</a>
+      <a href="#interface">Interface</a>
+
+      <div class="nav-section">Hotels</div>
+      <a href="#hotels-market">Market selection</a>
+      <a href="#hotels-filters">Filters</a>
+      <a href="#hotels-table">Results table</a>
+      <a href="#hotels-copy">Copying snippets</a>
+
+      <div class="nav-section">Run Agent</div>
+      <a href="#agent">Launch the agent</a>
+
+      <div class="nav-section">Reference</div>
+      <a href="#workflow">Workflow tips</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+
+    <div class="hero">
+      <div class="icon">🏨</div>
+      <h2>Hotel <em>Price Hunter</em></h2>
+      <p>Find the best hotel deals, select them, and copy HTML snippets straight into Contentful.</p>
+    </div>
+
+    <hr>
+
+    <!-- INTRO -->
+    <section id="intro">
+      <div class="section-num">01 · Introduction</div>
+      <h2>What is Hotel Price Hunter?</h2>
+      <p><strong>Hotel Price Hunter</strong> is an internal tool for the HolidayPirates editorial team. It connects to Google Sheets where the enrichment agent deposits hotel data from Trivago, and lets you filter, sort, select and copy HTML snippets ready to paste into Contentful.</p>
+      <p>In one sentence: <strong>you find the best hotel dates, verify the price, and copy the snippet — all in one place.</strong></p>
+
+      <h3>How to open it</h3>
+      <p>The tool is live at <a href="https://trivago-enrichment.netlify.app/" target="_blank" style="color:var(--p);font-weight:700">trivago-enrichment.netlify.app</a> — open it directly in your browser, no setup needed.</p>
+      <div class="note">ℹ️ The tool connects to Google Sheets automatically on load. If data doesn't appear, check your internet connection and try the <strong>↺ Refresh</strong> button.</div>
+    </section>
+
+    <hr>
+
+    <!-- QUICK START -->
+    <section id="quickstart">
+      <div class="section-num">02 · Quick start</div>
+      <h2>Your first selection in 60 seconds</h2>
+      <div class="steps">
+        <div class="step"><div class="step-n"></div><div class="step-body"><strong>Open the tool</strong> — go to <a href="https://trivago-enrichment.netlify.app/" target="_blank" style="color:var(--p);font-weight:700">trivago-enrichment.netlify.app</a>. Hotels for ES load automatically.</div></div>
+        <div class="step"><div class="step-n"></div><div class="step-body"><strong>Pick your market</strong> — click a market chip (🇪🇸 ES, 🇩🇪 DE, 🇬🇧 UK…). The table reloads with that market's data.</div></div>
+        <div class="step"><div class="step-n"></div><div class="step-body"><strong>Select a hotel</strong> — click a hotel chip to filter all dates for that property.</div></div>
+        <div class="step"><div class="step-n"></div><div class="step-body"><strong>Apply filters</strong> — narrow down by month, check-in day, nights or price per night.</div></div>
+        <div class="step"><div class="step-n"></div><div class="step-body"><strong>Select deals</strong> — check the boxes on the rows you want, or click <strong>☰ Top 20 cheapest</strong>.</div></div>
+        <div class="step"><div class="step-n"></div><div class="step-body"><strong>Copy snippets</strong> — click <strong>↓ Copy selected</strong> and paste into Contentful.</div></div>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- INTERFACE -->
+    <section id="interface">
+      <div class="section-num">03 · Interface</div>
+      <h2>Interface overview</h2>
+      <p>The tool has two tabs:</p>
+      <div class="chip-row">
+        <span class="chip-demo on">🏨 Hotels</span>
+        <span class="chip-demo">⚙️ Run Agent</span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Section</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Market chips</strong></td><td>Select which market to load (ES, DE, UK, FR, IT, NL, PL, CH, US, AT). Data is cached per session for fast switching.</td></tr>
+            <tr><td><strong>Hotel chips</strong></td><td>Filter to a specific hotel. "All" shows every hotel in the market.</td></tr>
+            <tr><td><strong>Filters</strong></td><td>Month, Check-in day (multi-select), Nights range, Max price per night.</td></tr>
+            <tr><td><strong>Results bar</strong></td><td>Count of matching dates and current sort order.</td></tr>
+            <tr><td><strong>Action buttons</strong></td><td>Top 20 cheapest · Deselect all · Copy selected snippets.</td></tr>
+            <tr><td><strong>Results table</strong></td><td>Sortable by check-in date, nights, price/night, total, TV/night and TV Total.</td></tr>
+            <tr><td><strong>↺ Refresh</strong></td><td>Clears the cache and reloads fresh data from the sheet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <hr>
+
+    <!-- HOTELS: MARKET -->
+    <section id="hotels-market">
+      <div class="section-num">04 · Hotels</div>
+      <h2>Market selection</h2>
+      <p>Click a market chip to load hotel data for that market. ES loads automatically when you open the tool. Data is cached per session — switching between markets is instant once loaded. To get fresh data from the sheet, click <strong>↺ Refresh</strong>.</p>
+      <div class="chip-row">
+        <span class="chip-demo on">🇪🇸 ES</span>
+        <span class="chip-demo">🇩🇪 DE</span>
+        <span class="chip-demo">🇬🇧 UK</span>
+        <span class="chip-demo">🇫🇷 FR</span>
+        <span class="chip-demo">🇮🇹 IT</span>
+        <span class="chip-demo">🇳🇱 NL</span>
+        <span class="chip-demo">🇵🇱 PL</span>
+        <span class="chip-demo">🇨🇭 CH</span>
+        <span class="chip-demo">🇺🇸 US</span>
+        <span class="chip-demo">🇦🇹 AT</span>
+      </div>
+      <div class="note">ℹ️ <strong>Prices extracted from Google Hotels</strong> — used as a reference to identify the cheapest check-in dates. When you check the price on Trivago it may turn out to be even cheaper.</div>
+    </section>
+
+    <hr>
+
+    <!-- HOTELS: FILTERS -->
+    <section id="hotels-filters">
+      <h2>Filters</h2>
+
+      <h3>Hotel</h3>
+      <p>Select a specific hotel from the chips to see only its dates. Select <span class="tag">All</span> to show dates across all hotels in the market.</p>
+
+      <h3>Month &amp; Check-in day</h3>
+      <p>Both support <strong>multi-selection</strong> — click individual chips to toggle them on or off. Clicking <span class="tag">All</span> resets the selection.</p>
+
+      <h3>Nights</h3>
+      <p>Double-handle slider. Drag the handles or type values in the number inputs — both controls stay in sync.</p>
+
+      <h3>Max price per night</h3>
+      <p>Single-handle slider. The filter applies to the <strong>Google per-night</strong> price. Shows <em>No limit</em> at maximum.</p>
+    </section>
+
+    <hr>
+
+    <!-- HOTELS: TABLE -->
+    <section id="hotels-table">
+      <h2>Results table</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Column</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Check-in</strong></td><td>Arrival date with day of week pill.</td></tr>
+            <tr><td><strong>Check-out</strong></td><td>Departure date with day of week pill.</td></tr>
+            <tr><td><strong>Nights</strong></td><td>Length of stay.</td></tr>
+            <tr><td><strong>~Price/night</strong></td><td>Approximate price per night from Google Hotels. The ~ indicates it's a reference price.</td></tr>
+            <tr><td><strong>~Total</strong></td><td>Approximate total stay cost from Google Hotels.</td></tr>
+            <tr><td><strong>TV/night</strong></td><td>Verified Trivago price per night. Shows — if not yet available.</td></tr>
+            <tr><td><strong>TV Total</strong></td><td>Verified Trivago total price. Shows — if not yet available.</td></tr>
+            <tr><td><strong>Link</strong></td><td>Check ↗ opens the booking on Trivago to verify the current price.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>🔥 Flame badge</h3>
+      <p>Appears independently on the cheapest <strong>~Price/night</strong> and the cheapest <strong>~Total</strong> in the current filtered results.</p>
+
+      <h3>Sorting</h3>
+      <p>Click any column header to sort; click again to reverse. Sortable columns: Check-in, Nights, ~Price/night, ~Total, TV/night, TV Total.</p>
+    </section>
+
+    <hr>
+
+    <!-- HOTELS: COPY -->
+    <section id="hotels-copy">
+      <h2>Copying snippets to Contentful</h2>
+      <div class="steps">
+        <div class="step"><div class="step-n"></div><div class="step-body">Check the box on each row you want. Selected rows highlight in purple.</div></div>
+        <div class="step"><div class="step-n"></div><div class="step-body">Or click <strong>☰ Top 20 cheapest</strong> to automatically select the 20 cheapest dates.</div></div>
+        <div class="step"><div class="step-n"></div><div class="step-body">Click <strong>↓ Copy N snippets</strong>. All HTML snippets are copied to your clipboard.</div></div>
+        <div class="step"><div class="step-n"></div><div class="step-body">Paste directly into Contentful.</div></div>
+      </div>
+      <p>When a Trivago price is available, the snippet includes it automatically:</p>
+      <code style="display:block;padding:1rem;margin:1rem 0;font-size:13px;line-height:1.8">&lt;p&gt;&lt;strong&gt;11.06 - 14.06 - 59€&lt;/strong&gt; &lt;a href="https://www.trivago.es/..." target="_blank" data-track-source="trivago_es_accommodations_affiliate"&gt;&lt;/a&gt;&lt;/p&gt;</code>
+      <p>If no Trivago price is available yet, the price is omitted from the snippet.</p>
+      <p>To clear your selection, click <strong>✕ Deselect all</strong>.</p>
+      <div class="note">ℹ️ Always verify the price via the <strong>Check ↗</strong> link on Trivago before publishing.</div>
+    </section>
+
+    <hr>
+
+    <!-- RUN AGENT -->
+    <section id="agent">
+      <div class="section-num">05 · Run Agent</div>
+      <h2>Launching the Hotel Enrichment Agent</h2>
+      <p>The <strong>⚙️ Run Agent</strong> tab opens the n8n enrichment agent form in a popup window. The form has two steps — no need to open n8n manually.</p>
+
+      <div class="steps">
+        <div class="step"><div class="step-n"></div><div class="step-body">Click the <strong>⚙️ Run Agent</strong> tab — the form popup opens automatically.</div></div>
+        <div class="step"><div class="step-n"></div><div class="step-body"><strong>Step 1:</strong> Type the hotel name. n8n searches and generates the available options.</div></div>
+        <div class="step"><div class="step-n"></div><div class="step-body"><strong>Step 2:</strong> Select the correct hotel from the dropdown and click Submit.</div></div>
+        <div class="step"><div class="step-n"></div><div class="step-body">The agent runs in the background — check the Google Sheet in a few minutes for results.</div></div>
+      </div>
+
+      <div class="note">ℹ️ If the popup is blocked by your browser, click <strong>⚡ Abrir formulario del agente</strong> on the Run Agent tab to open it manually. Allow popups for this site once and it will open automatically from then on.</div>
+    </section>
+
+    <hr>
+
+    <!-- WORKFLOW -->
+    <section id="workflow">
+      <div class="section-num">06 · Reference</div>
+      <h2>Workflow tips</h2>
+
+      <h3>Recommended workflow</h3>
+      <ol>
+        <li>Select your market.</li>
+        <li>Click a hotel chip to focus on one property.</li>
+        <li>Apply month and day-of-week filters to match your editorial calendar.</li>
+        <li>Click <strong>☰ Top 20 cheapest</strong> to pre-select the best dates.</li>
+        <li>Check <strong>TV/night</strong> column — rows with a Trivago price are ready to publish.</li>
+        <li>Verify prices via <strong>Check ↗</strong> before finalising.</li>
+        <li>Click <strong>↓ Copy selected</strong> and paste into Contentful.</li>
+      </ol>
+
+      <h3>Refresh &amp; cache</h3>
+      <p>Data is cached per market during the session for fast switching. If the Google Sheet has been updated, click <strong>↺ Refresh</strong> (top right) to reload all data fresh from the sheet — cache-busting is built in so you always get the latest data.</p>
+
+      <h3>Price context</h3>
+      <ul>
+        <li>~Price/night and ~Total are per-night approximations from Google Hotels.</li>
+        <li>TV/night and TV Total are verified prices scraped directly from Trivago.</li>
+        <li>The Trivago price is the one that goes into the published snippet.</li>
+        <li>Always verify via <strong>Check ↗</strong> before publishing.</li>
+      </ul>
+    </section>
+
+    <hr>
+
+  </main>
+</div>
+
+<script>
+const saved = localStorage.getItem('curator-manual-theme');
+if(saved) document.documentElement.setAttribute('data-theme', saved);
+function toggleTheme(){
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+  localStorage.setItem('curator-manual-theme', dark ? 'light' : 'dark');
+  document.getElementById('theme-btn').textContent = dark ? '🌙 Dark' : '☀️ Light';
+}
+if(saved === 'dark') document.getElementById('theme-btn').textContent = '☀️ Light';
+
+const sections = document.querySelectorAll('section[id]');
+const navLinks  = document.querySelectorAll('.sidebar a');
+const observer  = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      navLinks.forEach(a => a.classList.remove('active'));
+      const link = document.querySelector(`.sidebar a[href="#${e.target.id}"]`);
+      if(link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

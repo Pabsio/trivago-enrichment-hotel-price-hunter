@@ -143,9 +143,40 @@
     .popup-status.visible{display:flex}
     .popup-dot{width:8px;height:8px;border-radius:50%;background:#6A3460;animation:blink 1.2s infinite}
     @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+  #auth-gate{position:fixed;inset:0;background:#f5f2f5;z-index:9999;display:flex;align-items:center;justify-content:center}
+  #auth-gate.hidden{display:none}
+  .auth-card{background:#fff;border-radius:20px;padding:44px 48px;text-align:center;box-shadow:0 8px 40px rgba(106,52,96,.14);max-width:380px;width:90%}
+  .auth-logo{font-size:40px;margin-bottom:18px}
+  .auth-title{font-family:'Inter',sans-serif;font-size:22px;font-weight:800;color:#6A3460;margin-bottom:8px;letter-spacing:-.5px}
+  .auth-sub{font-size:14px;color:#888;margin-bottom:32px;line-height:1.6}
+  .auth-btn{width:100%;font-family:inherit;font-size:14px;font-weight:700;padding:13px 20px;border-radius:24px;border:none;background:#6A3460;color:#fff;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:10px}
+  .auth-btn:hover{background:#55285a;transform:translateY(-1px)}
+  .auth-badge{font-size:11px;color:#aaa;margin-top:16px}
+  #auth-error{color:#c0392b;font-size:12px;margin-top:12px;display:none}
+  #app-content{display:none}
+  .signout-btn{padding:6px 12px;background:#f5f0f5;color:#6A3460;border:1.5px solid #e4dce4;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s}
+  .signout-btn:hover{background:#6A3460;color:#fff;border-color:#6A3460}
   </style>
 </head>
 <body>
+
+<!-- AUTH GATE -->
+<div id="auth-gate">
+  <div class="auth-card">
+    <div class="auth-logo">🏨</div>
+    <div class="auth-title">Hotel Price Hunter</div>
+    <div class="auth-sub">Sign in with your HolidayPirates Google account to access the tool.</div>
+    <button class="auth-btn" onclick="loginWithGoogle()">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5h-1.9V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.1 29.6 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.4-2.1 14.1-5.5l-6.5-5.5c-2.1 1.5-4.8 2.5-7.6 2.5-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.6 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.5l6.5 5.5c3.8-3.5 6.3-8.7 6.3-15.5 0-1.3-.1-2.3-.4-3.5z"/></svg>
+      Sign in with Google
+    </button>
+    <div class="auth-badge">🔒 Restricted to @holidaypirates.com</div>
+    <div id="auth-error">Access denied. Please use your @holidaypirates.com or @extern.holidaypirates.com account.</div>
+  </div>
+</div>
+
+<!-- APP (hidden until authed) -->
+<div id="app-content">
 
 <div class="header">
   <div class="header-left">
@@ -155,6 +186,7 @@
   <div class="header-right">
     <a href="https://trivago-enrichment.netlify.app/manual" target="_blank" class="ibtn">❔ Help</a>
     <button class="ibtn primary" onclick="reloadAll()">↺ Refresh</button>
+    <button class="signout-btn" id="signout-btn" onclick="logout()">Sign out</button>
   </div>
 </div>
 
@@ -300,6 +332,7 @@
 
 </div>
 <div class="toast" id="toast"></div>
+</div><!-- /app-content -->
 
 <script>
 'use strict';
@@ -775,6 +808,80 @@ function hCopy(){
   copyText(snippets.join('\n'),snippets.length);
 }
 
+// ── AUTH ──────────────────────────────────────────────────────────────
+// Netlify Identity on this site, Google provider, restricted to HolidayPirates domains
+const IDENTITY_URL = window.location.origin;
+const ALLOWED_DOMAINS = ['@holidaypirates.com','@extern.holidaypirates.com'];
+let appStarted = false;
+
+function loginWithGoogle(){
+  const params=new URLSearchParams({
+    provider:'google',
+    redirect_to:window.location.origin+window.location.pathname
+  });
+  window.location.href=`${IDENTITY_URL}/.netlify/identity/authorize?${params}`;
+}
+
+function logout(){
+  localStorage.removeItem('hph_token');
+  localStorage.removeItem('hph_email');
+  document.getElementById('app-content').style.display='none';
+  document.getElementById('auth-gate').classList.remove('hidden');
+  window.location.hash='';
+}
+
+function decodeJWT(token){
+  try{
+    const b=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    return JSON.parse(decodeURIComponent(escape(atob(b))));
+  }catch{ return null; }
+}
+
+function emailAllowed(email){
+  return ALLOWED_DOMAINS.some(d=>email.toLowerCase().endsWith(d));
+}
+
+function startApp(){
+  if(appStarted) return;
+  appStarted = true;
+  document.getElementById('auth-gate').classList.add('hidden');
+  document.getElementById('app-content').style.display='block';
+  loadHotelMarket('ES');
+  preloadMarkets();
+}
+
+function handleAuth(){
+  // Returning from OAuth redirect — token comes in the URL hash
+  const hash=new URLSearchParams(window.location.hash.replace('#',''));
+  const hashToken=hash.get('access_token');
+  if(hashToken){
+    localStorage.setItem('hph_token',hashToken);
+    const payload=decodeJWT(hashToken);
+    if(payload&&payload.email) localStorage.setItem('hph_email',payload.email);
+    window.location.hash='';
+  }
+
+  const storedToken=localStorage.getItem('hph_token');
+  if(!storedToken){
+    document.getElementById('auth-gate').classList.remove('hidden');
+    return;
+  }
+  const payload=decodeJWT(storedToken);
+  // Expired or invalid token
+  if(!payload||(payload.exp&&payload.exp*1000<Date.now())){ logout(); return; }
+
+  const email=localStorage.getItem('hph_email')||payload.email||'';
+  if(!emailAllowed(email)){
+    document.getElementById('auth-error').style.display='block';
+    logout();
+    return;
+  }
+
+  const signoutBtn=document.getElementById('signout-btn');
+  if(signoutBtn) signoutBtn.title=email;
+  startApp();
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────
 const hInflight={};  // mkt -> Promise, prevents duplicate concurrent fetches
 
@@ -793,9 +900,6 @@ function getMarketData(mkt){
   return p;
 }
 
-loadHotelMarket('ES');
-preloadMarkets();
-
 // Preload remaining markets in background so switching is instant.
 // Starts at 600ms, staggered 500ms, and dedupes against on-demand loads.
 function preloadMarkets(){
@@ -808,6 +912,9 @@ function preloadMarkets(){
     });
   }, 600);
 }
+
+// Gate everything behind auth — app only loads after a valid HolidayPirates login
+handleAuth();
 
 
 </script>
